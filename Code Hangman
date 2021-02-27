@@ -1,0 +1,736 @@
+                        /************END SEMESTER PROJECT***********
+						                  HANGMAN GAME
+						********************************************/
+
+
+
+#include <stdio.h>
+#include <stdlib.h> //header file for rand() function
+#include <time.h> //header file for srand() function
+#include <windows.h> //header file for Sleep() function
+#include <ctype.h>
+#include <string.h>
+
+//function prototype for drawing hangman
+void hang1(); 
+void hang2();
+void hang3();
+void hang4();
+void hang5();
+void hang6();
+void hang7();
+void hang8();
+
+//function prototype for hints of the selected word
+void hints(int x);
+
+//start of main function
+int main()
+{
+	//srand function to generate the values of the rows randomly
+	srand(time(NULL));
+
+	//wordbank is already provided by us from which the word to be guessed is selected.
+	//it contains name of movies, fruits, vegetables and miscellaneous words
+	char wordbank[194][50] = { { "gladiator" }, { "inception" }, { "star wars" }, { "the avengers" }, { "interstellar" }, { "jaws" }, { "king kong" }, { "star trek" }, { "the dark knight" }, { "casino royale" }, { "mad max" }, { "sherlock holmes" }, { "the princess bride" }, { "the revenant" }, { "mission impossible" }, { "jurassic park" }, { "jumanji" }, { "avatar" }, { "life of pi" }, { "blood diamond" }, { "the martian" }, { "the shape of water" }, { "spider man" }, { "doctor strange" }, { "prometheus" }, { "terminator" }, { "the matrix" }, { "road house" }, { "unstoppable" }, { "apocalypto" }, { "highlander" }, { "die hard" }, { "the fugitive" }, { "v for vendetta" }, { "fast and furious" }, { "dunkirk" }, { "mr and mrs smith" }, { "rush hour" }, { "taken" }, { "captain america" }, { "baby driver" }, { "bloodsport" }, { "bonnie and clyde" }, { "edge of tomorrow" }, { "code of silence" }, { "wonder woman" }, { "avengers endgame" }, { "the hunger games" }, { "cast away" }, { "independence day" }, { "a nightmare on elm street" }, { "sinister" }, { "evil dead" }, { "the nun" }, { "bird box" }, { "paranormal activities" }, { "insidious" }, { "escape room" }, { "lights out" }, { "the grudge" }, { "crawl" }, { "the wicker man" }, { "get out" }, { "scream" }, { "alien" }, { "halloween" }, { "the exorcist" }, { "hereditary" }, { "the thing" }, { "saw" }, { "the orphanage" }, { "jigsaw" }, { "final destination" }, { "the conjuring" }, { "annabelle" }, { "pitch perfect" }, { "the addams family" }, { "anchorman" }, { "knives out" }, { "murder mystery" }, { "the hangover" }, { "parasite" }, { "clueless" }, { "the hustle" }, { "shazam" }, { "good boys" }, { "bridesmaids" }, { "home alone" }, { "wine country" }, { "long shot" }, { "stuber" }, { "the breakfast club" }, { "damaged goods" }, { "charlies angel" }, { "forrest gump" }, { "men in black" }, { "zombieland" }, { "someone great" }, { "abominable" }, { "the wolf of wall street" },{"toy story"},{"the incredibles"}, {"despicable me"}, {"ratatouille"},{"minions"}, {"tangled"},{"inside out"}, {"the lion king"}, {"finding nemo"},{"pocahontas"},{"finding dory"}, {"avacado" }, { "strawberry" }, { "blueberry" }, { "pomegranate" }, { "gooseberries" }, { "kiwi" }, { "jackfruit" }, { "guava" }, { "mandarin" }, { "lychee" }, { "nectarine" }, { "papaya" }, { "tamarind" }, { "raspberry" }, { "cantaloupe" }, { "tangarine" }, { "watermelon" }, { "rhubarb" }, { "passionfruit" }, { "clementine" }, { "cranberries" }, { "apricot" }, { "grapefruit" }, { "dates" }, { "dragonfruit" }, { "broccoli" }, { "pumpkin" }, { "lettuce" }, { "beetroot" }, { "cucumber" }, { "brussels sprout" }, { "artichoke" }, { "cabbage" }, { "cauliflower" }, { "radish" }, { "sweet potato" }, { "zucchini" }, { "mushroom" }, { "eggplant" }, { "ladyfinger" }, { "capsicum" }, { "carrots" }, { "spinach" }, { "garlic" }, { "fennel" }, { "onion" }, { "chamomile" }, { "parsley" }, { "star anise" }, { "caraway" }, { "coriander" }, { "accounting" }, { "social science" }, { "physical education" }, { "languages" }, { "linguistics" }, { "sociology" }, { "anthropology" }, { "archeology" }, { "astrology" }, { "mathematics" }, { "islamiat" }, { "divinity" }, { "architecture" }, { "agriculture" }, { "geography" }, { "statistics" }, { "economics" }, { "entrepreneurship" }, { "philosophy" }, { "finance" },{"the office"}, {"game of thrones"}, {"peaky blinders"}, {"money heist"},{"the society"},{"parks and rec"},{"shameless"},{"the originals"},{"shadowhunters"},{"the good place"},{"stranger things"},{"black mirror"} };
+
+	char begin; //variable stores 's', 'S', 'e' or 'E' that the user enters
+	int position = 0;
+	int tries = 0, wrongGuess = 0, rightentry, exit = 0, completeword = 0, decision;
+
+	/*wrongGuess: the chances of guessing wrong. these would be 8 in total.
+	rightentry: it is 1 if the user guesses right, otherwise it is 0.
+	exit: it is 1 if the user wants to exit the game, otherwise it is 0.
+	completeword: to check whether the word being guessed is completed or not.
+	decision: to store player's decision from the main menu.*/
+
+	int row_number = 0;
+
+	char word2guess[50], displayDashes[50];
+
+	//word2guess will store the word selected from the wordbank.
+	//displayDashes is used to dashes on the screen. The number of dashes is equal to the number of letters 
+	//in the original word.
+
+	char rightletters[1][20];
+	
+	//at the start of game, these are all asteriks
+	//when user enters the wrong letter, it will be stored here.
+
+	char opt, playagain, getLetter = '0';
+
+	/*getLetter: during guessing, the input from user is stored here.
+	opt: return to the main menu
+	playagain: to store 'y' or 'n' and see if user wants to play again or not.
+	*/
+
+	
+	do{
+		/*GAME STARTS FROM HERE
+		loop1: this is the outermost do-while loop.
+		We need to play the game at least one time so we use do-while loop.
+		Everything happens inside this loop.
+		*/
+		printf("\n\t\t\t\t************************************************\n\n");
+		printf("\n\t\t\t\t*                    HANGMAN                   *\n\n");
+		printf("\n\t\t\t\t************************************************\n\n");
+		printf("\n\t\t\t\t*     1. Press 's' or 'S' to start the game.   *\n\n");
+		printf("\n\t\t\t\t*           2. Press 'e' or 'E' to exit.       *\n\n");
+		printf("\n\t\t\t\t************************************************\n\n");
+		printf("\n\n\t\t\t\t                YOUR CHOICE: ");
+
+		/*loop2: A second do-while loop.
+		This loop takes in the begin value from the player and applies the relevant checks.
+		*/
+
+		do {
+			scanf(" %c", &begin);
+
+            //CHECKS FOR "begin"
+
+			//check1: if the player enters something other than the relevant letter.
+			if (begin != 'S' && begin != 's' && begin != 'e' && begin != 'E') 
+			{
+				printf("\n\n\t\t\t\t\tINVALID ENTRY. TRY AGAIN: ");
+			} //end of if
+
+			//check2:if the player wants to exit the game 
+			
+			if (begin == 'e' || begin == 'E') {
+				exit = 1; //exit value will become one
+				break; //loop2 will break 
+			} //end of if
+
+		} while (begin != 'S' && begin != 's' && begin != 'e' && begin != 'E'); //end loop2
+
+		if (exit) break; /*for exit value 1, loop1 will break and 
+						 the player will be taken to the end of game
+						 */
+
+		system("cls"); //clears the screen everytime this loop completes
+
+		//check3: if the player wants to play the game
+		if ((begin == 'S') || (begin == 's'))
+		{
+			//this menu will be displayed to him:
+			printf("\n\n\t\t\t\t****************************************\n");
+			printf("\n\n\t\t\t\t*              MAIN MENU               *\n");
+			printf("\n\n\t\t\t\t****************************************\n");
+			printf("\n\n\t\t\t\t*          Would you like to:          *\n");
+			printf("\n\n\t\t\t\t*               1. Play                *\n");
+			printf("\n\n\t\t\t\t*    2. Read the Rules (Recommended)   *\n");
+			printf("\n\n\t\t\t\t*            3. Exit the game          *\n");
+			printf("\n\n\t\t\t\t****************************************\n");
+			printf("\n\n\t\t\t\t              Your Choice = ");
+
+			/*loop3: to get the decision from the user.
+			The decision will wither be 1, 2, or 3.
+			we needed to execute this loop atleast one time so we used do-while.
+			loop will break run again if player enters something other than 1, 2 or 3*/
+			
+			do {
+				scanf("%d", &decision);
+
+				if ((decision != 1) && (decision != 2) && (decision != 3))
+				{
+					printf("\n\n\t\t\t\t****************************************\n\n");
+					printf("\n\n\t\t\t\t       INVALID ENTRY. TRY AGAIN: ");
+				} //end of if
+
+			} while ((decision != 1) && (decision != 2) && (decision != 3));
+			
+				//end loop3
+			/*if player enters 1, 2 or 3, loop ends*/
+
+			printf("\n\n\t\t\t\t****************************************\n\n");
+			system("cls");
+
+			//CHECKS FOR "decision"
+
+			//check1: if the player wants to exit
+			if (decision == 3) {
+				exit = 1; //exit value becomes 1
+				break; //break out of loop1
+			} //end if
+
+
+			//check2: if the player wants to read the rules:
+			if (decision == 2)
+			{
+				printf("\t\t\t    ****************************************************\n");
+				printf("\t\t\t    *                     RULES                        *\n");
+				printf("\t\t\t    ****************************************************");
+				printf("\n\n\t\t\t    *          1. Guess the word given to you          * \n ");
+				printf("\n\n\t\t\t    *    2. A clue will be provided for your help.     * \n");
+				printf("\n\n\t\t\t    *  3. While guessing the word, kindly enter the    *");
+				printf("\n\n\t\t\t    *               letters in lower case.             *\n");
+				printf("\n\n\t\t\t    *         4. Guess the letters in any order.       * \n");
+				printf("\n\n\t\t\t    *      5. You have 8 chances of wrong guesses.     *\n ");
+				printf("\n\n\t\t\t    *        6. If you wish to quit at any point,      *");
+				printf("\n\t\t\t    *                     just press 0.                *\n");
+				printf("\n\n\t\t\t    *              7. Don't forget to enjoy!           *\n");
+				printf("\n\t\t\t    ****************************************************\n");
+
+				printf("Enter any letter or number key to return to the start of game: ");
+				scanf("   %c", &opt);
+				system("cls");
+				if(opt) continue; //pressing any letter or number will take player to the start of game.
+				
+			} //end if
+
+			//check3: if user wants to play the game
+			if (decision == 1)
+			{
+			repeat:
+
+				/*loop4: A do-while loop.
+				this loop is the start of guessing progress.
+				this loop breaks only when the player wants to quit.
+				i-e playagain=='q'*/
+
+				do { 
+
+					char wrongletters[1][16] =  { "*,*,*,*,*,*,*,*" } ;
+					//wrongletters will store the wrong guesses made by the player.
+
+					position = 0;
+					tries = 0, wrongGuess = 0, rightentry, exit = 0, completeword = 0, decision;
+
+					int count = 0, c=1;
+
+					row_number = rand() % 193; //row number from 0 to 193 will be generated randomly
+					
+					int length = strlen(wordbank[row_number]);
+
+					/*length to store the length of the selected word.
+					strlen will not count the null character.
+					*/
+
+
+					int otherlength = length;
+					/*otherlength is a variable used in case the selected word contains a space.
+					otherlength will be the length of the word without spaces.*/
+
+					//we can print the word for out ease. just uncomment the line below.
+					//printf("the word is \"%s\" \n", wordbank[row_number]);
+
+					printf("\n\t\t\t\t************************************************\n");
+					printf("\n\t\t\t\t*                  YOUR WORD:                   *\n");
+					printf("\n\t\t\t\t    ");
+
+					/*loop5: A for loop.
+					this loop prints the dahes.
+					the number of dashes corresponds to the length of the selected word*/
+					for (int a = 0; a < (length); a++)
+					{
+						word2guess[a] = wordbank[row_number][a];
+						rightletters[0][a] = '*';
+
+						//storing the selected word in another string word2guess
+
+						//a space will be printed if the word contained a space at the place.
+						if (word2guess[a] == ' ') {
+							displayDashes[a] = ' ';
+							//in place of letters, a dash will be printed
+
+							otherlength--;
+							/*everytime a space is ecountered, the value of otherlength is decremented by 1*/
+						}
+
+						else
+							displayDashes[a] = ' _';
+
+						printf("%c  ", displayDashes[a]);
+					} //end loop5
+
+					_getch(); //to hold the screen
+
+					printf("\n\n\n");
+
+					displayDashes[length] = '\0'; //adding null character at the end to make this a string.
+					word2guess[length] = '\0';
+
+					printf("\n\t\t\t\t************************************************\n");
+					printf("\n\t\t\t\t*                      HINT                    *\n");
+					printf("\n\t\t\t\t************************************************\n");
+					hints(row_number); //calling function hints.
+
+					_getch();
+
+					printf("\n\t\t\t\t  REMEMBER: You can quit any time by pressing 0.\n");
+					_getch();
+					printf("\n\t\t\t\t*             READY? Starting in...            *\n");
+					Sleep(500); //to make the thread wait for the specified time
+					printf("\n\t\t\t\t                      3, ");
+					Sleep(500); //to make the thread wait for the specified time
+					printf("2, ");
+					Sleep(500);//to make the thread wait for the specified time
+					printf("1\n");
+					Sleep(500);//to make the thread wait for the specified time
+					printf("\n\t\t\t\t                        GO!!\n");
+
+
+					/*loop6: A while loop.
+					all logic happens inside this loop.
+					The variable wrongGuess starts from 0 and incriminates everytime the player enters the wrong letter.
+					When wrongGuess==8, the loop breaks.
+
+					Here, a is a variable used to store the result of string
+					compare. At every iteration of loop, the string of selected word i-e
+					word2guess and the string of the right letters entered by the player i-e
+					displaydashes will be compared with each other. When a becomes equal to 0,
+					the loop will break because it means that the player has guessed
+					the word completely.
+
+					otherwise the loop will run.*/
+
+					int a=1;
+
+					while (wrongGuess != 8 && a==1)
+					{
+						/*loop7: A do-while loop.
+						This loop gets the letter/guess from user.
+						Then performs the relevant checks.*/
+						do {
+							printf("\n\t\t\t\tEnter the alphabet: ");
+							scanf(" %c", &getLetter);
+
+							/*Initially rightentry is 0*/
+							rightentry = 0;
+
+							//CHECKS FOR "getLetter"
+
+							//check 1: If the player wants to stop guessing, he presses 0.
+							if (getLetter == '0')
+							{
+								printf("\n\t\t\t\tThe word was either too easy or too hard. We understand.\n\n");
+								exit = 1; //exit becomes 1.
+								break; //loop6 breaks and we reach the end of loop5
+							} //end if
+
+							//check 2: If the player enters something other than the lowercase alphabets
+
+							if (getLetter < 'a' || getLetter>'z') {
+								printf("\n\n\tSeeing this message? This might be because you've entered something which is");
+								printf("\n\n\t\t\t\t(a) not an alphabet  or (b) not a LOWERCASE alphabet\n\n");
+								printf("\t\t\t\tPlease try again.");
+								continue; //taken to the start of loop to get the input again
+							}
+
+							/*check 3: If the input is an alphabet, we proceed forward.
+							This else statement is responsible for determining whether the letter entered
+							belongs to the selected word or not.
+							*/
+
+							else {
+
+								/*loop8: A for loop.
+								This loop compares the input letter with every letter of the selected word.
+								Then performs the relevant checks.*/
+
+								for (int k = 0; k < length; k++)
+								{
+									//check 1: to see if a match is found
+									if (word2guess[k] == getLetter)
+									{
+										rightentry = 1; //if match is found, rightentry becomes 1
+										displayDashes[k] = getLetter; /*the letter replaces the dash which was
+																	  at its place.*/
+									}
+								}//end loop8
+ 
+								a = strcmp(word2guess, displayDashes); //if word2guess & displayDashes become equal, a becomes equal to 0 and the word has been guessed.
+
+								if (a==0)
+								{
+									int x = 0;
+									printf("\n\n\t\t\t\t");
+									while (displayDashes[x] != '\0')
+									{
+										printf("%c  ", displayDashes[x]);
+										x++;
+									}
+									printf("\n\n\t\t\t             *********CONGRATULATIONS*********\n");
+									_getch();
+									printf("\n\n\t\t\t              The word was indeed \"%s\"", wordbank[row_number]);
+									printf("\n\n\t\t\t   You Guessed it Right!! We are extremely proud of you :') \n");
+									printf("\n\n\t\t\t Now go to C2 and buy yourself a samosa to celebrate your victory!\n\n");
+									printf("\n\n\n\t\t\t Enter 'q' to quit and any other key to play again: ");
+
+
+									scanf(" %c", &playagain);
+									system("cls");
+
+									//if the player doesn't want to play again 
+									if (playagain == 'q') {
+										exit = 1; //exit will become 1
+										break; //break out of loop 6 and reach the end of loop 5
+									}
+
+									else
+										goto repeat;	//to go to the start of loop 4	
+								}
+
+								/*CHECKS FOR 'rightentry*/
+
+								//if rightentry==1, it means that the user has entered the correct letter
+								if (rightentry == 1) 
+								{
+									int again = 0; //again is 1 if repetition of letters is found, it is 0 otherwise
+									tries++; //number of correct tries is incrimented
+
+									//CHECKS FOR REPITION OF INPUT
+
+									if (tries == 1) {
+										printf("\n\n\t\t\t\t\t    ********CORRECT GUESS!********\n");
+										//at the first try, the letter is stored in another array
+										rightletters[0][0] = getLetter;
+									
+									}//end if (tries==1)
+									
+
+									/*At the second try, the number entered is compared with the array
+									to check for any repetition*/
+
+									if (tries >= 2)
+									{
+										/*this loop compares each element of rightletters with the letter
+										input by the player. if the letter maches any element of rightletters,
+										it means repitition has been found and again becomes 1.
+										*/
+
+										for (int b = 0; b < 20; b++)
+										{
+											/*if repetition is found, then this procedure is followed*/
+											if (getLetter == rightletters[0][b])
+											{
+												again = 1; //again becomes 1
+											}//end if
+
+										}//end for
+								
+										/*CHECKS FOR 'again'*/
+										
+										//if repition isn't found, then the letter is stored in rightletters
+								
+										if (again == 0) {
+											printf("\n\n\t\t\t\t\t    ********CORRECT GUESS!********\n");
+											rightletters[0][c] = getLetter;
+											c++;
+											
+										}
+
+										//if repetition is found, then this message is displayed.
+
+										if(again==1){
+									     printf("\n**Let us remind you that you've used this letter before. There are 26  alphabets in the English language. Try something else.\n");
+										}
+
+									} //end if(tries>=2)
+
+									printf("\n\t\t\t\t\tWRONG ENTRIES: %s\n", wrongletters[0]); //all the wrongly guessed letters are displayed
+									printf("\t\t\t\t\tCHANCES LEFT: %d.\n\n", 8 - wrongGuess); //chances of guessing wrong displayed
+									printf("\t\t\t\t************************************************\n");
+									
+								} // end if(rightentry==1)
+
+								/*NOW IF THE PLAYER MAKES A WRONG GUESS
+								
+								i-e rightentry==0*/
+
+								if (rightentry == 0)
+								{
+									int repetition = 0; /*repetition is 1 if repetition between letters is 
+														found. it is 0 otherwise*/
+
+									wrongGuess++; 
+									              /*wrongGuess is the number of wrong guesses made by 
+												  the player. At a wrong guess, when rightentry is 0,
+												  wrongGuess is incremented.
+									               the limit is from 0 to 8*/
+
+									/*
+									
+									wrongletters is initialized above as:
+									wrongletters[0][16]={"*,*,*,*,*,*,*,*"};
+									
+									at the first wrong guess, the letter is stored at the first
+									place of the wrongletters.
+
+									as the second place contains a comma, so the position moves from 1 to 3
+									by adding 2 in it.*/
+
+									if (wrongGuess == 1) {
+										wrongletters[0][position] = getLetter;
+										position = position + 2;
+									}
+
+									/*At the second wrong guess and above, the letter entered is first 
+									checked for repetion in this if-else statement
+									*/
+									
+									if (wrongGuess >= 2)
+									{
+										/*loop8: A for loop:
+										In this loop, a comparison between the letter entered and wrongletters
+										takes place. 
+										If the entered letter matches any element of the string wrongletters,
+										then it means that the letter is being repeated and repetition
+										becomes 1*/
+
+										for (int place = 0; place <= 16; place = place + 2)
+										{
+											if (getLetter == wrongletters[0][place])
+												repetition = 1;
+										}//end loop8
+
+										/*if a match isn't found, then repetition remains 0 and the 
+										following statements are executed.*/
+
+										if (repetition == 0) {
+											wrongletters[0][position] = getLetter; 
+
+											/*the letter is stored at the next position
+										     where there was an asterik. commas remain
+										     at their place*/
+
+											position = position + 2;
+										}
+
+										/*if repetition is found, then these statements are
+										executed.*/
+										else
+										{
+											wrongGuess--; /*number of wrong guesses is 
+														  decremented because the letter was 
+														  alredy used.*/
+
+											//this message is displayed.
+											printf("\n**Let us remind you that you've used this letter before. There are 26  alphabets in the English language. Try something else.\n");
+										}
+
+									} //end if(wrongGuess>=2)
+
+									/*This happens only if the letter isn't repeated.*/
+
+									if (repetition == 0)
+									{
+										system("cls");
+
+										printf("\n\n\t\t\t\t\t    ********WRONG GUESS!********\n\n");
+										printf("\n\n\t\t\t\t\tYour hangman: ");
+
+										/*Fnction calls to display hangmans corresponding to the number of wrongGuess*/
+										if (wrongGuess == 1)
+										{
+											hang1(); 
+										}
+										if (wrongGuess == 2)
+										{
+											hang1();
+											hang2();
+										}
+										if (wrongGuess == 3)
+										{
+											hang1(); hang2(); hang3();
+										}
+										if (wrongGuess == 4)
+										{
+											hang1(); hang2(); hang3(); hang4();
+										}
+										if (wrongGuess == 5)
+										{
+											hang1(); hang2(); hang3(); hang4(); hang5();
+											printf("\n\n\t\t\t\t    ******** 3 CHANCES LEFT. THINK WISELY ********");
+										}
+										if (wrongGuess == 6)
+										{
+											hang1(); hang2(); hang3(); hang4(); hang5(); hang6();
+											printf("\n\n\t\t\t\t    ******** TWO!! CHANCES!! ********");
+										}
+										if (wrongGuess == 7)
+										{
+
+											hang1(); hang2(); hang3(); hang4(); hang5(); hang6(); hang7();
+											printf("\n\n\t\t\t\t    ********ONLY ONE!! WHAT ARE YOU DOING SHERLOCK!!********");
+
+										}
+
+										/*at the last wrong guess, the hangman will be completed
+										and a losing message will be displayed.*/
+										if (wrongGuess == 8)
+										{
+											hang1(); hang2(); hang3(); hang4(); hang5(); hang6(); hang7(); hang8();
+											printf("\n\n\t\t\t\tYOU. HANGED. HIM. CHIEF. The man is now DEAD!!. Great Job :(\n\n");
+											printf("\n\n\t\t\t\tThe word was \"%s\".", wordbank[row_number]);
+											printf("\n\n\t\t\t\t\t\t\tBetter luck next time!\n\n");
+											printf("\n\n\n\t\t\t Enter 'n' to quit and any other letter to play again: ");
+
+											//the player will either want to quit the game or play again.
+											scanf(" %c", &playagain);
+											system("cls");
+											if (playagain == 'q') {
+												exit = 1; //exit becomes 1
+												break; //break out of loop 7
+											}
+
+											else //if user player wants to play again, then loop 7 
+												//will start executing again.
+												continue;
+										}
+
+									}
+									printf("\n\n\t\t\t\tWRONG ENTRIES: %s\n", wrongletters[0]);
+									printf("\t\t\t\tCHANCES LEFT: %d.\n\n", 8 - wrongGuess);
+									printf("\t\t\t\t************************************************\n");
+
+								}
+							} //end else
+							int count = 0;
+
+							printf("\n\n\t\t\t\t");
+
+							/*loop 10: A while loop.
+							This loop is responsible for displaying the word right as it is being 
+							guessed, with the letters already guessed at their place and
+							the dashes in the place of unguessed letters.*/
+							while (displayDashes[count] != '\0')
+							{
+								printf("%c  ", displayDashes[count]);
+								count++;
+							}//end loop 10
+
+							if (exit) break; //when exit==1, break out of loop 7
+
+						} while (rightentry == 0 && wrongGuess != 8); //loop7
+
+						if (exit) break; //when exit==1, break out of loop 6
+
+					} //end loop 6
+
+					if (exit) break;
+
+				}while (playagain != 'q');
+
+			} //end loop 4
+
+		}//end if (decision==1)
+
+     if (exit) break; //if exit==1, break out of loop 1
+
+	} while (1); //end loop1
+
+
+	if (exit == 1) //when exit becomes 1, this message is displayed
+	{
+		printf("\n\n\t\t\t\t**************************************************** ");
+		printf("\n\t\t\t\t*                     GAME ENDED                   *\n");
+		printf("\n\t\t\t\t****************************************************\n");
+		printf("\n\t\t\t\t*        Thankyou for playing this little game!    *\n");
+		printf("\n\t\t\t\t*              We hope you enjoyed it :)           *");
+		printf("\n\n\t\t\t\t*               Come again anytime!!               *");
+		printf("\n\n\t\t\t\t****************************************************  \n ");
+	}
+
+	return 0;
+
+	                         /*WE"VE REACHED THE END OF THE PROGRAM*/
+} //end main.
+
+                                    /*Fnction definitions*/
+
+//Hangman Function 1: to print a horizontal line
+void hang1()
+{
+	printf("\t\t\t\t");
+	for (int i = 0; i <= 20; i++)
+	{
+		printf("_");
+		Sleep(100); //makes the thread wait for some time
+	}
+	printf("\n");
+}
+
+
+//Function 2: to display a verticle line
+void hang2()
+{
+	for (int k = 0; k < 5; k++)
+	{
+		printf("\t\t\t\t\t\t\t\t\t\t|\t  |\n");
+		Sleep(100);//makes the thread wait for some time
+	}
+}
+
+//Function 3: to display the head of hangman
+void hang3()
+{
+	printf("\t\t\t\t\t\t\t\t\t\t\t ***\n");
+	Sleep(100); //makes the thread wait for some time
+	printf("\t\t\t\t\t\t\t\t\t\t\t(   )\n");
+	Sleep(100); //makes the thread wait for some time
+	printf("\t\t\t\t\t\t\t\t\t\t\t ***");
+	Sleep(100); //makes the thread wait for some time
+}
+
+//Funcction 4: to display the body
+void hang4()
+{
+	for (int j = 0; j < 6; j++)
+	{
+		printf("\n\t\t\t\t\t\t\t\t\t\t\t  |");
+		Sleep(100); //makes the thread wait for some time
+	}
+}
+
+//Function 5: to display one arm
+void hang5()
+{
+	printf("\r\t\t\t\t\t\t\t\t\t\t\t / ");
+}
+
+//Function 6: to display second arm
+void hang6()
+{
+	printf("\\\n");
+}
+//Function 7: to display one leg
+void hang7()
+{
+	Sleep(200); //makes the thread wait for some time
+	printf("\r\t\t\t\t\t\t\t\t\t\t\t /");
+}
+
+//Function 8: to display second leg
+void hang8()
+{
+	Sleep(200); //makes the thread wait for some time
+	printf(" \\");
+}
+
+//Function 9: to display the hints
+void hints(int x)
+{
+	char yourhints[9][120] = { {" ADVENTURE MOVIE "}, {" ACTION MOVIE "},
+	{" HORROR MOVIE "}, {" COMEDY MOVIE "},{"ANIMATED MOVIE"},{" FRUIT NAME "},
+	{" VEGETABLE NAME "}, {" SUBJECT NAME "}, {"SERIES"} };
+
+	if (x >= 0 && x <= 24)
+		printf("\n\t\t\t\t\t\t  %s\n\n", yourhints[0]);
+	if (x > 24 && x <= 49)
+		printf("\n\t\t\t\t\t\t  %s\n\n", yourhints[1]);
+	if (x > 49 && x <= 74)
+		printf("\n\t\t\t\t\t\t  %s\n\n", yourhints[2]);
+	if (x > 74 && x <= 99)
+		printf("\n\t\t\t\t\t\t  %s\n\n", yourhints[3]);
+	if (x > 99 && x <= 110)
+		printf("\n\t\t\t\t\t\t  %s\n\n", yourhints[4]);
+	if (x > 110 && x <= 135)
+		printf("\n\t\t\t\t\t\t  %s\n\n", yourhints[5]);
+	if (x > 135 && x <= 161)
+		printf("\n\t\t\t\t\t\t  %s\n\n", yourhints[6]);
+	if(x>161 && x<=181)
+		printf("\n\t\t\t\t\t\t  %s\n\n", yourhints[7]);
+	if (x > 181 && x <= 193)
+		printf("\n\t\t\t\t\t\t  %s\n\n", yourhints[8]);
+}
